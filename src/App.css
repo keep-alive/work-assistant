@@ -1,0 +1,28 @@
+.app{
+    height: 100vh;
+    padding: 12px;
+    background: #f4f6f9;
+    
+}
+.left-wrapper{
+    height: 100%;
+    margin-right: 12px;
+    background: #fff;
+}
+.search {
+    height: 40px;
+}
+.file-list{
+    height: calc(100% - 90px);
+    overflow-y: auto;
+}
+.file-btns{
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+.right-wrapper{
+    height: 100%;
+    background: #fff;
+}
