@@ -4,6 +4,9 @@
     background: #f4f6f9;
     
 }
+.pad{
+    padding: 3px;
+}
 .left-wrapper{
     height: 100%;
     margin-right: 12px;
@@ -15,6 +18,30 @@
 .file-list{
     height: calc(100% - 90px);
     overflow-y: auto;
+}
+.file{
+    height: 38px;
+    display: flex;
+    padding: 0 12px;
+    list-style: none;
+    color: #666;
+}
+.file-title{
+    padding-left: 6px;
+}
+.file-detail{
+    height: 100%;
+    width: 70%;
+    flex-grow: 0;
+    display: flex;
+    align-items: center;
+}
+.file-operate-btns{
+    height: 100%;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 .file-btns{
     height: 50px;
