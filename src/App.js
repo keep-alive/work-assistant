@@ -15,7 +15,12 @@ function App() {
 					<FileSearch title="搜索文件名" onSearch={onSearch}/>
 				</Col>
 				<Col className="file-list" span={24}>
-					<FileList files={files}/>
+					<FileList 
+						files={files}
+						onFileClick={(id) => console.log(id)}
+						onSaveEdit={(id,value) => console.log(id,value)}
+						onFileDelete={(id) => console.log(id)}
+					/>
 				</Col>
 				<Col className="file-btns" span={24}>
 					<FileBtns />
