@@ -1,5 +1,7 @@
-import './App.css';
 import { Row, Col } from 'antd'
+import SimpleMDE from "react-simplemde-editor";
+import "easymde/dist/easymde.min.css";
+import './App.css';
 import FileSearch from './components/FileSearch'
 import FileList from './components/FileList'
 import FileBtns from './components/FileBtns' 
@@ -35,7 +37,10 @@ function App() {
 			</Col>
 			<Col className="right-wrapper"  flex="auto">
 				<TabList files={files} onTabClick={onTabClick} onCloseTab={onCloseTab} activeId={1} unsavedIds={[1]}/>
-				<Col className="edit-area" span={24}></Col>
+				<Col className="edit-area" span={24}>
+					<SimpleMDE 
+					/>
+				</Col>
 			</Col>
 		</Row>
 	);
