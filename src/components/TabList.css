@@ -1,0 +1,45 @@
+.tabs-nav{
+    display: flex;
+    align-items: center;
+}
+.nav-tab{
+    background: #fafafa;
+    border: 1px solid #f0f0f0;
+    margin: 0;
+    padding: 8px 12px;
+    transition: all .3s cubic-bezier(.645,.045,.355,1);
+    cursor: pointer;
+}
+.nav-tab-active{
+    background: #fff;
+    color: #1890ff;
+}
+.nav-tab+.nav-tab{
+    margin-left: 2px;
+}
+.nav-tab:hover .close-icon{
+    visibility: visible;
+}
+.with-unsaved-mark.nav-tab .close-icon{
+    display: none;
+}
+.with-unsaved-mark.nav-tab:hover .close-icon{
+    display: inline-block;
+}
+.with-unsaved-mark.nav-tab:hover .unsaved-icon{
+    display: none;
+}
+.close-icon{
+    visibility: hidden;
+    font-size: 12px;
+}
+.unsaved-icon{
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 12px;
+    background-color: #d9534f;
+}
+.pad{
+    padding: 2px;
+}

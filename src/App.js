@@ -3,10 +3,17 @@ import { Row, Col } from 'antd'
 import FileSearch from './components/FileSearch'
 import FileList from './components/FileList'
 import FileBtns from './components/FileBtns' 
+import TabList from './components/TabList'
 import files from './utils/defaultFile'
 function App() {
 	const onSearch = (v) => {
 		console.log(v)
+	}
+	const onTabClick = (id) => {
+		console.log(id)
+	}
+	const onCloseTab = (id) => {
+		console.log(id)
 	}
 	return (
 		<Row className="app">
@@ -26,7 +33,10 @@ function App() {
 					<FileBtns />
 				</Col>
 			</Col>
-			<Col className="right-wrapper"  flex="auto"></Col>
+			<Col className="right-wrapper"  flex="auto">
+				<TabList files={files} onTabClick={onTabClick} onCloseTab={onCloseTab} activeId={1} unsavedIds={[1]}/>
+				<Col className="edit-area" span={24}></Col>
+			</Col>
 		</Row>
 	);
 }
