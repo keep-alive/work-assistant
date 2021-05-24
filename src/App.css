@@ -54,6 +54,15 @@
     height: 100%;
     background: #fff;
 }
+.start-page{
+    font-size: 20px;
+    width: 100%;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+}
 .edit-area{
     height: calc(100% - 40px);
 }

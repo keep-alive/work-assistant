@@ -6,28 +6,39 @@ import useKeyPress from '../hooks/useKeyPress'
 const FileList = ({files, onFileClick, onSaveEdit, onFileDelete}) => {
     const [ editStatus, setEditStatus ] = useState(false);
     const [ value, setValue ] = useState('');
-    const closeSearch = () => {
+    const closeSearch = (editItem) => {
         setEditStatus(false);
-        setValue('')
+        setValue('');
+        if(editItem.isNew) {
+            onFileDelete(editItem.id)
+        }
     }
     const enterPressed = useKeyPress(13)
     const escPressed = useKeyPress(27)
     useEffect(() => {
-        if(enterPressed && editStatus) {
-            const editItem = files.find(file => file.id === editStatus);
+        const editItem = files.find(file => file.id === editStatus);
+        if(enterPressed && editStatus && value.trim()) {
             onSaveEdit(editItem.id,value);
-            closeSearch()
+            closeSearch({})
         } else if(escPressed && editStatus) {
-            closeSearch()
+            closeSearch(editItem)
         }
     })
+    useEffect(() => {
+        const newFile = files.find(({isNew}) => isNew);
+        if(newFile) {
+            setEditStatus(newFile.id);
+            setValue(newFile.title)
+        }
+
+    },[files])
     return (
         <ul className="files">
             {
                 files.map(file => {
                     return <li key={file.id} className="file">
                         {
-                            editStatus !== file.id ?
+                            editStatus !== file.id && !file.isNew ?
                             <>
                                 <div className="file-detail">
                                     <FileMarkdownOutlined/>
@@ -46,10 +57,10 @@ const FileList = ({files, onFileClick, onSaveEdit, onFileDelete}) => {
                             :
                             <>
                                 <div className="file-detail">
-                                    <Input onChange={(e) => setValue(e.target.value)} value={value} size="middle"/>
+                                    <Input placeholder="请输入文件名称" onChange={(e) => setValue(e.target.value)} value={value} size="middle"/>
                                 </div>
                                 <div className="file-operate-btns">
-                                    <a onClick={closeSearch}>
+                                    <a onClick={() => { closeSearch(file) }}>
                                         <CloseOutlined />
                                     </a>
                                 </div>
