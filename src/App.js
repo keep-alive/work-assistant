@@ -9,34 +9,31 @@ import FileList from './components/FileList'
 import FileBtns from './components/FileBtns' 
 import TabList from './components/TabList'
 import defaultFiles from './utils/defaultFile'
+import { flattenArr, objToArray } from './utils/helper'
 function App() {
-	const [ files, setFiles ] = useState(defaultFiles);
+	const [ files, setFiles ] = useState(flattenArr(defaultFiles));
 	const [ searchfiles, setsearchFiles ] = useState([]);
 	const [ activeFileId, setActiveFileId ] = useState('');
 	const [ openedFileIds, setOpenedFileIds ] = useState([]);
 	const [ unsavedFileIds, setUnsavedFileIds ] = useState([]);
+	const filesArr = objToArray(files);
 	const openedFiles = openedFileIds.map(id => {
-		return files.find(file => file.id === id)
+		return files[id]
 	})
-	const activeFile = files.find(file => file.id === activeFileId)
+	const activeFile = files[activeFileId]
 
 	const deleteFile = (id) => {
-		const currentFiles = files.filter(file => file.id !== id);
-		setFiles(currentFiles);
+		Reflect.deleteProperty(files,[id])
+		setFiles(files);
 		onCloseTab(id);
 	}
 	const updateFileName = (id,title) => {
-		const currentFiles = files.map(file => {
-			if(file.id === id) {
-				return {
-					...file,
-					title,
-					isNew:false
-				}
-			}
-			return file
-		})
-		setFiles(currentFiles);
+		const file = {
+			...files[id],
+			title,
+			isNew: false
+		}
+		setFiles({ ...files, [id]:file });
 	}
 	const fileClick = (id) => {
 		const openIds = openedFileIds.includes(id) ? openedFileIds : [...openedFileIds,id]
@@ -44,7 +41,7 @@ function App() {
 		setOpenedFileIds(openIds);
 	}
 	const onSearch = (keyword) => {
-		const currentFiles = files.filter(({title}) => title.includes(keyword))
+		const currentFiles = filesArr.filter(({title}) => title.includes(keyword))
 		setsearchFiles(currentFiles);
 	}
 	const onTabClick = (id) => {
@@ -57,22 +54,25 @@ function App() {
 		setActiveFileId(activeId);
 	}
 	const fileChange = (id,value) => {
+		const file = { ...files[id], body: value };
+		setFiles({ ...files, [id]:file });
 		if(!unsavedFileIds.includes(id)) {
-			setUnsavedFileIds([...unsavedFileIds, id])
+			setUnsavedFileIds([...unsavedFileIds,id])
 		}
 	}
 	const createFile = () => {
-		setFiles([
+		const id = uuidv4();
+		setFiles({
 			...files,
-			{
-				id: uuidv4(),
+			[id]:{
+				id,
 				title: '',
 				isNew: true,
 				body: '## 请输入文件内容'
 			}
-		]);
+		});
 	}
-	const fileList = searchfiles.length > 0 ? searchfiles : files;
+	const fileList = searchfiles.length > 0 ? searchfiles : filesArr;
 	return (
 		<Row className="app">
 			<Col className="left-wrapper" flex="300px">
