@@ -8,10 +8,25 @@ import FileSearch from './components/FileSearch'
 import FileList from './components/FileList'
 import FileBtns from './components/FileBtns' 
 import TabList from './components/TabList'
-import defaultFiles from './utils/defaultFile'
-import { flattenArr, objToArray } from './utils/helper'
+import { objToArray } from './utils/helper'
+import fileHelper from './utils/fileHelper'
+const path  = window.require('path')
+const { ipcRenderer }  = window.require('electron')
+const savedLocation = ipcRenderer.sendSync('documents-path');
+const saveFilesToStore = (files) => {
+	const storeFiles = objToArray(files).reduce((result,file) => {
+		const { id, path, title } = file;
+		result[id] = {
+			id, path, title
+		}
+		return result;
+	},{})
+	localStorage.setItem('files', JSON.stringify(storeFiles));
+}
 function App() {
-	const [ files, setFiles ] = useState(flattenArr(defaultFiles));
+	const stringFiles = localStorage.getItem('files');
+	const localFiles = stringFiles ? JSON.parse(stringFiles) : {};
+	const [ files, setFiles ] = useState(localFiles);
 	const [ searchfiles, setsearchFiles ] = useState([]);
 	const [ activeFileId, setActiveFileId ] = useState('');
 	const [ openedFileIds, setOpenedFileIds ] = useState([]);
@@ -23,22 +38,59 @@ function App() {
 	const activeFile = files[activeFileId]
 
 	const deleteFile = (id) => {
-		Reflect.deleteProperty(files,[id])
-		setFiles(files);
-		onCloseTab(id);
+		if(files[id].isNew) {
+			const { [id]: value, ...other } = files;
+			setFiles(other);
+		}else{
+			fileHelper.deleteFile(files[id]['path']).then(() => {
+				const { [id]: value, ...other } = files;
+				setFiles(other);
+				onCloseTab(id);
+				saveFilesToStore(files);
+			})
+		}
 	}
-	const updateFileName = (id,title) => {
+	const updateFileName = (id,title, isNew) => {
+		const newPath = path.join(savedLocation,`${title}.md`);
 		const file = {
 			...files[id],
 			title,
-			isNew: false
+			isNew: false,
+			path: newPath
 		}
-		setFiles({ ...files, [id]:file });
+		const newFiles = {
+			...files, [id]:file 
+		}
+		if(isNew) {
+			fileHelper.writeFile(newPath,files[id]['body']).then(() => {
+				setFiles(newFiles);
+				saveFilesToStore(newFiles);
+			})
+		} else {
+			fileHelper.renameFile(path.join(savedLocation,`${files[id]['title']}.md`),newPath).then(() => {
+				setFiles(newFiles);
+				saveFilesToStore(newFiles);
+			})
+		}
 	}
 	const fileClick = (id) => {
+		const file = files[id];
 		const openIds = openedFileIds.includes(id) ? openedFileIds : [...openedFileIds,id]
 		setActiveFileId(id);
 		setOpenedFileIds(openIds);
+		if(!file.isLoaded) {
+			fileHelper.readFile(file.path).then((body) => {
+				setFiles({
+					...files,
+					[id]:{
+						...files[id],
+						body,
+						isLoaded: true
+					}
+				})
+			})
+		}
+		
 	}
 	const onSearch = (keyword) => {
 		const currentFiles = filesArr.filter(({title}) => title.includes(keyword))
@@ -71,6 +123,11 @@ function App() {
 				body: '## 请输入文件内容'
 			}
 		});
+	}
+	const saveCurrentFile = () => {
+		fileHelper.writeFile(path.join(savedLocation,`${activeFile.title}.md`),activeFile['body']).then(() => {
+			setUnsavedFileIds(unsavedFileIds.filter(id => id !== activeFile.id))
+		})
 	}
 	const fileList = searchfiles.length > 0 ? searchfiles : filesArr;
 	return (

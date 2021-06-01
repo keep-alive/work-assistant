@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Input } from 'antd';
 import PropTypes from 'prop-types'
 import { FileMarkdownOutlined, EditOutlined, DeleteOutlined, CheckOutlined, CloseOutlined} from '@ant-design/icons'
@@ -18,7 +18,7 @@ const FileList = ({files, onFileClick, onSaveEdit, onFileDelete}) => {
     useEffect(() => {
         const editItem = files.find(file => file.id === editStatus);
         if(enterPressed && editStatus && value.trim()) {
-            onSaveEdit(editItem.id,value);
+            onSaveEdit(editItem.id,value,editItem.isNew);
             closeSearch({})
         } else if(escPressed && editStatus) {
             closeSearch(editItem)
