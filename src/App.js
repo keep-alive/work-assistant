@@ -10,9 +10,12 @@ import FileBtns from './components/FileBtns'
 import TabList from './components/TabList'
 import { objToArray } from './utils/helper'
 import fileHelper from './utils/fileHelper'
+import getmenuOptions from './utils/menuOptions'
 const path  = window.require('path')
 const { ipcRenderer }  = window.require('electron')
+const { Menu }  = window.require('electron').remote
 const savedLocation = ipcRenderer.sendSync('documents-path');
+const isMac = ipcRenderer.sendSync('is-mac');
 const saveFilesToStore = (files) => {
 	const storeFiles = objToArray(files).reduce((result,file) => {
 		const { id, path, title } = file;
@@ -76,6 +79,7 @@ function App() {
 	const fileClick = (id) => {
 		const file = files[id];
 		const openIds = openedFileIds.includes(id) ? openedFileIds : [...openedFileIds,id]
+		
 		setActiveFileId(id);
 		setOpenedFileIds(openIds);
 		if(!file.isLoaded) {
@@ -130,6 +134,28 @@ function App() {
 		})
 	}
 	const fileList = searchfiles.length > 0 ? searchfiles : filesArr;
+	const menus = getmenuOptions(isMac).map(option => {
+		let { id, submenu } = option;
+		if(id === '2') {
+			return {
+				...option,
+				submenu: [
+					{
+						label: '保存',
+						enabled: !!activeFile,
+						accelerator: 'CommandOrControl+S',	
+						click() {
+							saveCurrentFile()
+						}
+					},
+					...submenu
+				]
+			}
+		}
+		return option
+	})
+	const menuTemplate = Menu.buildFromTemplate(menus);
+    Menu.setApplicationMenu(menuTemplate);
 	return (
 		<Row className="app">
 			<Col className="left-wrapper" flex="300px">
